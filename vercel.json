@@ -1,14 +1,9 @@
 {
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "functions": {
-    "api/trpc/[trpc].ts": {
-      "includeFiles": "server/**,drizzle/**,shared/**"
-    }
-  },
   "rewrites": [
-    { "source": "/api/trpc/:path*", "destination": "/api/trpc/[trpc]" },
+    { "source": "/api/trpc/:path*", "destination": "/api/trpc" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
