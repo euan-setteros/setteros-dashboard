@@ -10,7 +10,11 @@ let _db: ReturnType<typeof drizzle> | null = null;
 
 export function getDb() {
   if (!_db && process.env.DATABASE_URL) {
-    const client = postgres(process.env.DATABASE_URL);
+    const client = postgres(process.env.DATABASE_URL, {
+      prepare: false, // Required for Supabase transaction pooler
+      idle_timeout: 20,
+      max_lifetime: 60 * 5,
+    });
     _db = drizzle(client);
   }
   if (!_db) throw new Error("DATABASE_URL not configured");
