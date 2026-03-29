@@ -3583,52 +3583,6 @@ async function resolveResponse(opts) {
   }
 }
 
-// node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/dist/adapters/fetch/index.mjs
-var import_objectSpread24 = __toESM2(require_objectSpread2(), 1);
-var trimSlashes = (path) => {
-  path = path.startsWith("/") ? path.slice(1) : path;
-  path = path.endsWith("/") ? path.slice(0, -1) : path;
-  return path;
-};
-async function fetchRequestHandler(opts) {
-  const resHeaders = new Headers();
-  const createContext = async (innerOpts) => {
-    var _opts$createContext;
-    return (_opts$createContext = opts.createContext) === null || _opts$createContext === void 0 ? void 0 : _opts$createContext.call(opts, (0, import_objectSpread24.default)({
-      req: opts.req,
-      resHeaders
-    }, innerOpts));
-  };
-  const url2 = new URL(opts.req.url);
-  const pathname = trimSlashes(url2.pathname);
-  const endpoint = trimSlashes(opts.endpoint);
-  const path = trimSlashes(pathname.slice(endpoint.length));
-  return await resolveResponse((0, import_objectSpread24.default)((0, import_objectSpread24.default)({}, opts), {}, {
-    req: opts.req,
-    createContext,
-    path,
-    error: null,
-    onError(o) {
-      var _opts$onError;
-      opts === null || opts === void 0 || (_opts$onError = opts.onError) === null || _opts$onError === void 0 || _opts$onError.call(opts, (0, import_objectSpread24.default)((0, import_objectSpread24.default)({}, o), {}, { req: opts.req }));
-    },
-    responseMeta(data) {
-      var _opts$responseMeta;
-      const meta = (_opts$responseMeta = opts.responseMeta) === null || _opts$responseMeta === void 0 ? void 0 : _opts$responseMeta.call(opts, data);
-      if (meta === null || meta === void 0 ? void 0 : meta.headers) {
-        if (meta.headers instanceof Headers) for (const [key, value] of meta.headers.entries()) resHeaders.append(key, value);
-        else
-          for (const [key, value] of Object.entries(meta.headers)) if (Array.isArray(value)) for (const v of value) resHeaders.append(key, v);
-          else if (typeof value === "string") resHeaders.set(key, value);
-      }
-      return {
-        headers: resHeaders,
-        status: meta === null || meta === void 0 ? void 0 : meta.status
-      };
-    }
-  }));
-}
-
 // node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/dist/initTRPC-CB9uBez5.mjs
 var import_objectSpread2$2 = __toESM2(require_objectSpread2(), 1);
 var middlewareMarker = "middlewareMarker";
@@ -3846,8 +3800,8 @@ If you want to call this function on the server, see https://trpc.io/docs/v11/se
 `.trim();
 async function callRecursive(index, _def, opts) {
   try {
-    const middleware = _def.middlewares[index];
-    const result = await middleware((0, import_objectSpread2$13.default)((0, import_objectSpread2$13.default)({}, opts), {}, {
+    const middleware2 = _def.middlewares[index];
+    const result = await middleware2((0, import_objectSpread2$13.default)((0, import_objectSpread2$13.default)({}, opts), {}, {
       meta: _def.meta,
       input: opts.input,
       next(_nextOpts) {
@@ -3889,7 +3843,7 @@ var _globalThis$process;
 var _globalThis$process2;
 var _globalThis$process3;
 var isServerDefault = typeof window === "undefined" || "Deno" in window || ((_globalThis$process = globalThis.process) === null || _globalThis$process === void 0 || (_globalThis$process = _globalThis$process.env) === null || _globalThis$process === void 0 ? void 0 : _globalThis$process["NODE_ENV"]) === "test" || !!((_globalThis$process2 = globalThis.process) === null || _globalThis$process2 === void 0 || (_globalThis$process2 = _globalThis$process2.env) === null || _globalThis$process2 === void 0 ? void 0 : _globalThis$process2["JEST_WORKER_ID"]) || !!((_globalThis$process3 = globalThis.process) === null || _globalThis$process3 === void 0 || (_globalThis$process3 = _globalThis$process3.env) === null || _globalThis$process3 === void 0 ? void 0 : _globalThis$process3["VITEST_WORKER_ID"]);
-var import_objectSpread25 = __toESM2(require_objectSpread2(), 1);
+var import_objectSpread24 = __toESM2(require_objectSpread2(), 1);
 var TRPCBuilder = class TRPCBuilder2 {
   /**
   * Add a context shape as a generic to the root object
@@ -3911,7 +3865,7 @@ var TRPCBuilder = class TRPCBuilder2 {
   */
   create(opts) {
     var _opts$transformer, _opts$isDev, _globalThis$process$1, _opts$allowOutsideOfS, _opts$errorFormatter, _opts$isServer;
-    const config2 = (0, import_objectSpread25.default)((0, import_objectSpread25.default)({}, opts), {}, {
+    const config2 = (0, import_objectSpread24.default)((0, import_objectSpread24.default)({}, opts), {}, {
       transformer: getDataTransformer((_opts$transformer = opts === null || opts === void 0 ? void 0 : opts.transformer) !== null && _opts$transformer !== void 0 ? _opts$transformer : defaultTransformer),
       isDev: (_opts$isDev = opts === null || opts === void 0 ? void 0 : opts.isDev) !== null && _opts$isDev !== void 0 ? _opts$isDev : ((_globalThis$process$1 = globalThis.process) === null || _globalThis$process$1 === void 0 ? void 0 : _globalThis$process$1.env["NODE_ENV"]) !== "production",
       allowOutsideOfServer: (_opts$allowOutsideOfS = opts === null || opts === void 0 ? void 0 : opts.allowOutsideOfServer) !== null && _opts$allowOutsideOfS !== void 0 ? _opts$allowOutsideOfS : false,
@@ -3935,6 +3889,219 @@ var TRPCBuilder = class TRPCBuilder2 {
   }
 };
 var initTRPC = new TRPCBuilder();
+
+// node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/dist/node-http-8dtdvMrE.mjs
+function createBody(req, opts) {
+  if ("body" in req) {
+    if (req.body === void 0) return void 0;
+    if (typeof req.body === "string") return req.body;
+    return JSON.stringify(req.body);
+  }
+  let size2 = 0;
+  let hasClosed = false;
+  return new ReadableStream({
+    start(controller) {
+      const onData = (chunk) => {
+        size2 += chunk.length;
+        if (!opts.maxBodySize || size2 <= opts.maxBodySize) {
+          controller.enqueue(new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength));
+          return;
+        }
+        controller.error(new TRPCError({ code: "PAYLOAD_TOO_LARGE" }));
+        hasClosed = true;
+        req.off("data", onData);
+        req.off("end", onEnd);
+      };
+      const onEnd = () => {
+        if (hasClosed) return;
+        hasClosed = true;
+        req.off("data", onData);
+        req.off("end", onEnd);
+        controller.close();
+      };
+      req.on("data", onData);
+      req.on("end", onEnd);
+    },
+    cancel() {
+      req.destroy();
+    }
+  });
+}
+function createURL(req) {
+  try {
+    var _ref, _req$headers$host;
+    const protocol = req.headers[":scheme"] && req.headers[":scheme"] === "https" || req.socket && "encrypted" in req.socket && req.socket.encrypted ? "https:" : "http:";
+    const host = (_ref = (_req$headers$host = req.headers.host) !== null && _req$headers$host !== void 0 ? _req$headers$host : req.headers[":authority"]) !== null && _ref !== void 0 ? _ref : "localhost";
+    return new URL(req.url, `${protocol}//${host}`);
+  } catch (cause) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Invalid URL",
+      cause
+    });
+  }
+}
+function createHeaders(incoming) {
+  const headers = new Headers();
+  for (const key in incoming) {
+    const value = incoming[key];
+    if (typeof key === "string" && key.startsWith(":")) continue;
+    if (Array.isArray(value)) for (const item of value) headers.append(key, item);
+    else if (value != null) headers.append(key, value);
+  }
+  return headers;
+}
+function incomingMessageToRequest(req, res, opts) {
+  const ac = new AbortController();
+  const onAbort = () => {
+    res.off("close", onAbort);
+    req.off("aborted", onAbort);
+    ac.abort();
+  };
+  res.once("close", onAbort);
+  req.once("aborted", onAbort);
+  const url2 = createURL(req);
+  const init = {
+    headers: createHeaders(req.headers),
+    method: req.method,
+    signal: ac.signal
+  };
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    init.body = createBody(req, opts);
+    init.duplex = "half";
+  }
+  const request = new Request(url2, init);
+  return request;
+}
+async function writeResponseBodyChunk(res, chunk) {
+  if (res.write(chunk) === false) await new Promise((resolve, reject) => {
+    const onError = (err) => {
+      reject(err);
+      cleanup();
+    };
+    const onDrain = () => {
+      resolve();
+      cleanup();
+    };
+    const cleanup = () => {
+      res.off("error", onError);
+      res.off("drain", onDrain);
+    };
+    res.once("error", onError);
+    res.once("drain", onDrain);
+  });
+}
+async function writeResponseBody(opts) {
+  const { res } = opts;
+  try {
+    const writableStream = new WritableStream({ async write(chunk) {
+      var _res$flush;
+      await writeResponseBodyChunk(res, chunk);
+      (_res$flush = res.flush) === null || _res$flush === void 0 || _res$flush.call(res);
+    } });
+    await opts.body.pipeTo(writableStream, { signal: opts.signal });
+  } catch (err) {
+    if (isAbortError(err)) return;
+    throw err;
+  }
+}
+async function writeResponse(opts) {
+  const { response, rawResponse } = opts;
+  if (rawResponse.statusCode === 200) rawResponse.statusCode = response.status;
+  for (const [key, value] of response.headers) rawResponse.setHeader(key, value);
+  try {
+    if (response.body) await writeResponseBody({
+      res: rawResponse,
+      signal: opts.request.signal,
+      body: response.body
+    });
+  } catch (err) {
+    if (!rawResponse.headersSent) rawResponse.statusCode = 500;
+    throw err;
+  } finally {
+    rawResponse.end();
+  }
+}
+var import_objectSpread25 = __toESM2(require_objectSpread2(), 1);
+function internal_exceptionHandler(opts) {
+  return (cause) => {
+    var _opts$onError;
+    const { res, req } = opts;
+    const error46 = getTRPCErrorFromUnknown(cause);
+    const shape = getErrorShape({
+      config: opts.router._def._config,
+      error: error46,
+      type: "unknown",
+      path: void 0,
+      input: void 0,
+      ctx: void 0
+    });
+    (_opts$onError = opts.onError) === null || _opts$onError === void 0 || _opts$onError.call(opts, {
+      req,
+      error: error46,
+      type: "unknown",
+      path: void 0,
+      input: void 0,
+      ctx: void 0
+    });
+    const transformed = transformTRPCResponse(opts.router._def._config, { error: shape });
+    res.statusCode = shape.data.httpStatus;
+    res.end(JSON.stringify(transformed));
+  };
+}
+async function nodeHTTPRequestHandler(opts) {
+  return new Promise((resolve) => {
+    var _opts$middleware;
+    const handleViaMiddleware = (_opts$middleware = opts.middleware) !== null && _opts$middleware !== void 0 ? _opts$middleware : (_req, _res, next) => next();
+    opts.res.once("finish", () => {
+      resolve();
+    });
+    return handleViaMiddleware(opts.req, opts.res, (err) => {
+      run(async () => {
+        var _opts$maxBodySize;
+        const request = incomingMessageToRequest(opts.req, opts.res, { maxBodySize: (_opts$maxBodySize = opts.maxBodySize) !== null && _opts$maxBodySize !== void 0 ? _opts$maxBodySize : null });
+        const createContext = async (innerOpts) => {
+          var _opts$createContext;
+          return await ((_opts$createContext = opts.createContext) === null || _opts$createContext === void 0 ? void 0 : _opts$createContext.call(opts, (0, import_objectSpread25.default)((0, import_objectSpread25.default)({}, opts), innerOpts)));
+        };
+        const response = await resolveResponse((0, import_objectSpread25.default)((0, import_objectSpread25.default)({}, opts), {}, {
+          req: request,
+          error: err ? getTRPCErrorFromUnknown(err) : null,
+          createContext,
+          onError(o) {
+            var _opts$onError2;
+            opts === null || opts === void 0 || (_opts$onError2 = opts.onError) === null || _opts$onError2 === void 0 || _opts$onError2.call(opts, (0, import_objectSpread25.default)((0, import_objectSpread25.default)({}, o), {}, { req: opts.req }));
+          }
+        }));
+        await writeResponse({
+          request,
+          response,
+          rawResponse: opts.res
+        });
+      }).catch(internal_exceptionHandler(opts));
+    });
+  });
+}
+
+// node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/dist/adapters/express.mjs
+var import_objectSpread26 = __toESM2(require_objectSpread2(), 1);
+function createExpressMiddleware(opts) {
+  return (req, res) => {
+    let path = "";
+    run(async () => {
+      path = req.path.slice(req.path.lastIndexOf("/") + 1);
+      await nodeHTTPRequestHandler((0, import_objectSpread26.default)((0, import_objectSpread26.default)({}, opts), {}, {
+        req,
+        res,
+        path
+      }));
+    }).catch(internal_exceptionHandler((0, import_objectSpread26.default)({
+      req,
+      res,
+      path
+    }, opts)));
+  };
+}
 
 // server/trpc.ts
 var import_superjson = __toESM(require_dist(), 1);
@@ -25979,15 +26146,17 @@ var appRouter = router({
 });
 
 // server/api-handler.ts
-async function handler(req) {
-  return fetchRequestHandler({
-    endpoint: "/api/trpc",
-    req,
-    router: appRouter,
-    createContext: () => {
-      const pin = req.headers.get("x-admin-pin") ?? void 0;
-      return { adminPin: pin };
-    }
+var middleware = createExpressMiddleware({
+  router: appRouter,
+  createContext: ({ req }) => ({
+    adminPin: req.headers["x-admin-pin"]
+  })
+});
+function handler(req, res) {
+  req.url = req.url?.replace(/^\/api\/trpc\/?/, "/") ?? req.url;
+  return middleware(req, res, () => {
+    res.statusCode = 404;
+    res.end("Not found");
   });
 }
 export {
