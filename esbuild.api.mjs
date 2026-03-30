@@ -6,7 +6,7 @@ await build({
   platform: "node",
   target: "node20",
   format: "esm",
-  outfile: "api/trpc.js",
+  outfile: "api/trpc/[...path].js",
   banner: {
     js: 'import { createRequire } from "module"; const require = createRequire(import.meta.url);',
   },

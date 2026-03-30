@@ -3800,8 +3800,8 @@ If you want to call this function on the server, see https://trpc.io/docs/v11/se
 `.trim();
 async function callRecursive(index, _def, opts) {
   try {
-    const middleware2 = _def.middlewares[index];
-    const result = await middleware2((0, import_objectSpread2$13.default)((0, import_objectSpread2$13.default)({}, opts), {}, {
+    const middleware = _def.middlewares[index];
+    const result = await middleware((0, import_objectSpread2$13.default)((0, import_objectSpread2$13.default)({}, opts), {}, {
       meta: _def.meta,
       input: opts.input,
       next(_nextOpts) {
@@ -4081,26 +4081,6 @@ async function nodeHTTPRequestHandler(opts) {
       }).catch(internal_exceptionHandler(opts));
     });
   });
-}
-
-// node_modules/.pnpm/@trpc+server@11.6.0_typescript@5.9.3/node_modules/@trpc/server/dist/adapters/express.mjs
-var import_objectSpread26 = __toESM2(require_objectSpread2(), 1);
-function createExpressMiddleware(opts) {
-  return (req, res) => {
-    let path = "";
-    run(async () => {
-      path = req.path.slice(req.path.lastIndexOf("/") + 1);
-      await nodeHTTPRequestHandler((0, import_objectSpread26.default)((0, import_objectSpread26.default)({}, opts), {}, {
-        req,
-        res,
-        path
-      }));
-    }).catch(internal_exceptionHandler((0, import_objectSpread26.default)({
-      req,
-      res,
-      path
-    }, opts)));
-  };
 }
 
 // server/trpc.ts
@@ -26146,17 +26126,17 @@ var appRouter = router({
 });
 
 // server/api-handler.ts
-var middleware = createExpressMiddleware({
-  router: appRouter,
-  createContext: ({ req }) => ({
-    adminPin: req.headers["x-admin-pin"]
-  })
-});
-function handler(req, res) {
-  req.url = req.url?.replace(/^\/api\/trpc\/?/, "/") ?? req.url;
-  return middleware(req, res, () => {
-    res.statusCode = 404;
-    res.end("Not found");
+async function handler(req, res) {
+  const url2 = req.url ?? "/";
+  const path = url2.replace(/^\/api\/trpc\/?/, "").split("?")[0];
+  return nodeHTTPRequestHandler({
+    router: appRouter,
+    path,
+    req,
+    res,
+    createContext: () => ({
+      adminPin: req.headers["x-admin-pin"]
+    })
   });
 }
 export {
