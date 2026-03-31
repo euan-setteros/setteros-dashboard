@@ -26064,8 +26064,7 @@ var appRouter = router({
       setterId: external_exports.number().int().positive(),
       adjustmentDate: external_exports.string(),
       targetTotal: external_exports.number().int().min(0),
-      adjustmentType: external_exports.enum(["weekly", "alltime"]).default("weekly"),
-      reason: external_exports.string().min(1).max(500)
+      adjustmentType: external_exports.enum(["weekly", "alltime"]).default("weekly")
     })).mutation(async ({ input }) => {
       const adjDate = new Date(input.adjustmentDate);
       let currentTotal = 0;
@@ -26088,7 +26087,6 @@ var appRouter = router({
         adjustmentDate: adjDate,
         bellDelta,
         adjustmentType: input.adjustmentType,
-        reason: input.reason,
         adjustedBy: "Admin"
       });
       return { success: true, delta: bellDelta, message: `Adjusted by ${bellDelta > 0 ? "+" : ""}${bellDelta}` };

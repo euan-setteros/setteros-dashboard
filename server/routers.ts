@@ -127,7 +127,6 @@ export const appRouter = router({
         adjustmentDate: z.string(),
         targetTotal: z.number().int().min(0),
         adjustmentType: z.enum(["weekly", "alltime"]).default("weekly"),
-        reason: z.string().min(1).max(500),
       }))
       .mutation(async ({ input }) => {
         const adjDate = new Date(input.adjustmentDate);
@@ -151,7 +150,6 @@ export const appRouter = router({
           adjustmentDate: adjDate,
           bellDelta,
           adjustmentType: input.adjustmentType,
-          reason: input.reason,
           adjustedBy: "Admin",
         });
         return { success: true, delta: bellDelta, message: `Adjusted by ${bellDelta > 0 ? '+' : ''}${bellDelta}` };

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -90,7 +89,6 @@ function AdjustmentsContent() {
   const [selectedSetter, setSelectedSetter] = useState<string>("");
   const [targetTotal, setTargetTotal] = useState("0");
   const [adjustmentDate, setAdjustmentDate] = useState(() => new Date().toISOString().split("T")[0]);
-  const [reason, setReason] = useState("");
   const [adjustmentType, setAdjustmentType] = useState<"weekly" | "alltime">("weekly");
   const [viewTab, setViewTab] = useState<string>("weekly");
 
@@ -148,7 +146,6 @@ function AdjustmentsContent() {
       setDialogOpen(false);
       setSelectedSetter("");
       setTargetTotal("0");
-      setReason("");
       setAdjustmentType("weekly");
     },
     onError: (error) => {
@@ -170,8 +167,8 @@ function AdjustmentsContent() {
   });
 
   const handleSubmit = () => {
-    if (!selectedSetter || !reason.trim()) {
-      toast.error("Please fill in all fields");
+    if (!selectedSetter) {
+      toast.error("Please select a setter");
       return;
     }
     addMutation.mutate({
@@ -179,7 +176,6 @@ function AdjustmentsContent() {
       adjustmentDate: new Date(adjustmentDate).toISOString(),
       targetTotal: targetNum,
       adjustmentType,
-      reason: reason.trim(),
     });
   };
 
@@ -248,7 +244,6 @@ function AdjustmentsContent() {
             {adj.adjustmentType === "alltime" ? "All-Time" : "Weekly"}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground truncate">{adj.reason}</p>
         <p className="text-xs text-muted-foreground mt-0.5">
           {new Date(adj.adjustmentDate).toLocaleDateString("en-GB", { weekday: "short", month: "short", day: "numeric" })}
           {adj.adjustedBy ? ` — by ${adj.adjustedBy}` : ""}
@@ -438,18 +433,6 @@ function AdjustmentsContent() {
                     </div>
                   )}
 
-                  <div className="grid gap-2">
-                    <Label>Reason</Label>
-                    <Textarea
-                      value={reason}
-                      onChange={e => setReason(e.target.value)}
-                      placeholder={adjustmentType === "weekly"
-                        ? "e.g., Franco mentioned 2 meetings in chat but didn't post bells"
-                        : "e.g., Adding historical meetings from before the dashboard was set up"
-                      }
-                      rows={3}
-                    />
-                  </div>
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
@@ -457,7 +440,7 @@ function AdjustmentsContent() {
                   </Button>
                   <Button
                     onClick={handleSubmit}
-                    disabled={addMutation.isPending || !selectedSetter || !reason.trim()}
+                    disabled={addMutation.isPending || !selectedSetter}
                     className="bg-primary text-primary-foreground"
                   >
                     {addMutation.isPending ? (
