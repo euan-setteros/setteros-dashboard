@@ -25831,23 +25831,23 @@ async function getDailyBreakdown(weekStart, weekEnd) {
   const result = await db.select({
     setterId: bellEntries.setterId,
     displayName: setters.displayName,
-    dayDate: sql`DATE(${bellEntries.messageDate})`.as("dayDate"),
+    dayDate: sql`to_char(${bellEntries.messageDate}::date, 'YYYY-MM-DD')`.as("dayDate"),
     dailyBells: sql`SUM(${bellEntries.bellCount})`.as("dailyBells")
-  }).from(bellEntries).innerJoin(setters, eq(bellEntries.setterId, setters.id)).where(and(gte(bellEntries.messageDate, weekStart), lte(bellEntries.messageDate, weekEnd))).groupBy(bellEntries.setterId, setters.displayName, sql`DATE(${bellEntries.messageDate})`).orderBy(asc(sql`dayDate`), desc(sql`dailyBells`));
+  }).from(bellEntries).innerJoin(setters, eq(bellEntries.setterId, setters.id)).where(and(gte(bellEntries.messageDate, weekStart), lte(bellEntries.messageDate, weekEnd))).groupBy(bellEntries.setterId, setters.displayName, sql`${bellEntries.messageDate}::date`).orderBy(asc(sql`${bellEntries.messageDate}::date`), desc(sql`"dailyBells"`));
   const adjustments = await db.select({
     setterId: manualAdjustments.setterId,
     displayName: setters.displayName,
-    dayDate: sql`DATE(${manualAdjustments.adjustmentDate})`.as("dayDate"),
+    dayDate: sql`to_char(${manualAdjustments.adjustmentDate}::date, 'YYYY-MM-DD')`.as("dayDate"),
     dailyDelta: sql`SUM(${manualAdjustments.bellDelta})`.as("dailyDelta")
   }).from(manualAdjustments).innerJoin(setters, eq(manualAdjustments.setterId, setters.id)).where(and(
     gte(manualAdjustments.adjustmentDate, weekStart),
     lte(manualAdjustments.adjustmentDate, weekEnd),
     eq(manualAdjustments.adjustmentType, "weekly")
-  )).groupBy(manualAdjustments.setterId, setters.displayName, sql`DATE(${manualAdjustments.adjustmentDate})`);
+  )).groupBy(manualAdjustments.setterId, setters.displayName, sql`${manualAdjustments.adjustmentDate}::date`);
   const merged = /* @__PURE__ */ new Map();
   for (const r of result) {
     const key = `${r.setterId}-${r.dayDate}`;
-    merged.set(key, { setterId: r.setterId, displayName: r.displayName, dayDate: r.dayDate, dailyBells: Number(r.dailyBells) });
+    merged.set(key, { setterId: r.setterId, displayName: r.displayName, dayDate: String(r.dayDate), dailyBells: Number(r.dailyBells) });
   }
   for (const a of adjustments) {
     const key = `${a.setterId}-${a.dayDate}`;
@@ -25855,7 +25855,7 @@ async function getDailyBreakdown(weekStart, weekEnd) {
     if (existing) {
       existing.dailyBells += Number(a.dailyDelta);
     } else {
-      merged.set(key, { setterId: a.setterId, displayName: a.displayName, dayDate: a.dayDate, dailyBells: Number(a.dailyDelta) });
+      merged.set(key, { setterId: a.setterId, displayName: a.displayName, dayDate: String(a.dayDate), dailyBells: Number(a.dailyDelta) });
     }
   }
   return Array.from(merged.values()).filter((e) => e.dailyBells > 0).sort((a, b2) => a.dayDate.localeCompare(b2.dayDate) || b2.dailyBells - a.dailyBells);
@@ -25884,13 +25884,27 @@ async function getTeamTotals(weekStart, weekEnd) {
 async function getWeeklyTrend(weeksBack = 4) {
   const db = getDb();
   const startDate = /* @__PURE__ */ new Date();
-  startDate.setDate(startDate.getDate() - weeksBack * 7);
-  const result = await db.select({
-    weekStart: sql`DATE_TRUNC('week', ${bellEntries.messageDate})::date`.as("weekStart"),
+  startDate.setUTCDate(startDate.getUTCDate() - weeksBack * 7);
+  const weekExpr = sql`DATE_TRUNC('week', ${bellEntries.messageDate})`;
+  const bellResults = await db.select({
+    weekStart: sql`to_char(${weekExpr}::date, 'YYYY-MM-DD')`.as("weekStart"),
     totalBells: sql`SUM(${bellEntries.bellCount})`.as("totalBells"),
     activeSetters: sql`COUNT(DISTINCT ${bellEntries.setterId})`.as("activeSetters")
-  }).from(bellEntries).where(gte(bellEntries.messageDate, startDate)).groupBy(sql`weekStart`).orderBy(asc(sql`weekStart`));
-  return result;
+  }).from(bellEntries).where(gte(bellEntries.messageDate, startDate)).groupBy(weekExpr).orderBy(asc(weekExpr));
+  const adjWeekExpr = sql`DATE_TRUNC('week', ${manualAdjustments.adjustmentDate})`;
+  const adjResults = await db.select({
+    weekStart: sql`to_char(${adjWeekExpr}::date, 'YYYY-MM-DD')`.as("weekStart"),
+    totalDelta: sql`SUM(${manualAdjustments.bellDelta})`.as("totalDelta")
+  }).from(manualAdjustments).where(and(
+    gte(manualAdjustments.adjustmentDate, startDate),
+    eq(manualAdjustments.adjustmentType, "weekly")
+  )).groupBy(adjWeekExpr);
+  const adjMap = new Map(adjResults.map((a) => [String(a.weekStart), Number(a.totalDelta)]));
+  return bellResults.map((r) => ({
+    weekStart: String(r.weekStart),
+    totalBells: Number(r.totalBells) + (adjMap.get(String(r.weekStart)) ?? 0),
+    activeSetters: Number(r.activeSetters)
+  }));
 }
 async function getAllTimeLeaderboard() {
   const db = getDb();
